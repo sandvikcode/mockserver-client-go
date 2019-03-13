@@ -1,5 +1,4 @@
 deps:
-	dep ensure
 	go get -u golang.org/x/lint/golint
 
 # Lint the go code. Note: golint doesn't support vendor folder exclusion so we use find to filter it out
@@ -8,6 +7,9 @@ lint: deps
 	@go vet ./...
 	@echo "Checking style with golint..."
 	@find . -type d -not -path "./vendor*" -exec golint {} \;
+
+vendor:
+	dep ensure -vendor-only
 
 # Build in the real Google cloud
 cb:

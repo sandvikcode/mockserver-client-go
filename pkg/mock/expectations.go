@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// TODO: Linter is angry as you must document the API
 type ResponseBody struct {
 	Type   string `json:"type"`
 	String string `json:"string"`
@@ -32,7 +33,7 @@ type ExpectationOption func(e *Expectation) *Expectation
 func CreateExpectation(opts ...ExpectationOption) *Expectation {
 	e := &Expectation{
 		Request: &RequestMatcher{
-			Path: "/",
+			Path: "/",  //TODO: Is this a good default? This will match exactly "/"
 		},
 		Response: &ActionResponse{
 			StatusCode: http.StatusOK,

@@ -32,6 +32,7 @@ func (hms *Client) AddExpectation(exp *Expectation) {
 
 // Clear some expectations for a given path in Mock-Server
 // TODO: refactor with a clear model
+// TODO: this could be part of expectations.go? http://www.mock-server.com/mock_server/clearing_and_resetting.html
 func (hms *Client) Clear(path string) {
 	mockReqBody := fmt.Sprintf(`
 			{
@@ -43,6 +44,7 @@ func (hms *Client) Clear(path string) {
 
 // VerifyMinMax Mock-Server was called at least and at most N number of times. Note: -1 is infinite number of times.
 // TODO: refactor with a clear model
+// TODO: Move to verifications.go For the model we will have VerifyCount and VerifySequence, see http://www.mock-server.com/mock_server/verification.html
 func (hms *Client) VerifyMinMax(path string, atLeast int, atMost int) {
 	mockReqBody := fmt.Sprintf(`
 			{
@@ -60,6 +62,7 @@ func (hms *Client) VerifyMinMax(path string, atLeast int, atMost int) {
 }
 
 // Reset the entire Mock-Server, clearing all state
+// TODO: This should be part of client as it clears everything..verifications, expectations etc
 func (hms *Client) Reset() {
 	hms.callMock("reset", "")
 }
@@ -80,8 +83,7 @@ func (hms *Client) callMock(mockAPI, mockReqBody string) {
 
 	mockReq, err := http.NewRequest("PUT", mockURL, reader)
 	if err != nil {
-		require.NoError(hms.T, err,
-			"Failed to create request to mock server.")
+		require.NoError(hms.T, err, "Failed to create request to mock server.")
 	}
 	mockRes, err := hc.Do(mockReq)
 	if err != nil {
