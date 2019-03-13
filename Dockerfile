@@ -22,7 +22,7 @@ WORKDIR ${GOPATH}/src/github.com/${repoName}/${projectName}
 # Get the source files in
 COPY . .
 
-# Lint
-RUN [ "make", "lint" ]
+# Get dependencies and then lint
+RUN [ "make", "vendor", "lint" ]
 
 COPY vendor ./vendor
