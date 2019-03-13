@@ -25,3 +25,4 @@ COPY . .
 # Lint
 RUN [ "make", "lint" ]
 
+COPY vendor ./vendor
