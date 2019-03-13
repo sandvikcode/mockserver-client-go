@@ -33,7 +33,7 @@ type ExpectationOption func(e *Expectation) *Expectation
 func CreateExpectation(opts ...ExpectationOption) *Expectation {
 	e := &Expectation{
 		Request: &RequestMatcher{
-			Path: "/",  //TODO: Is this a good default? This will match exactly "/"
+			Path: "/(.*)",
 		},
 		Response: &ActionResponse{
 			StatusCode: http.StatusOK,
