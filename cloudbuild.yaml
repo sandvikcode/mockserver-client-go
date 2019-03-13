@@ -1,0 +1,11 @@
+# This cloudbuild file is used by GitHub integration and dev trigger.
+steps:
+# 0. Lint the library inside docker
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', '${_LIBRARY_NAME}', '.', '--cache-from', 'eu.gcr.io/$PROJECT_ID/${_LIBRARY_NAME}']
+# 1. Run the go units tests
+- name: 'gcr.io/cloud-builders/go'
+  args: ['test', './...']
+  env: ['PROJECT_ROOT=${_LIBRARY_NAME}']
+substitutions:
+  _LIBRARY_NAME: flames-library-mockserver-client
