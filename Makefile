@@ -11,6 +11,9 @@ lint: deps
 vendor:
 	dep ensure -vendor-only
 
+test:
+	go test ./...
+
 # Build in the real Google cloud
 cb:
 	gcloud builds submit --config cloudbuild.yaml .

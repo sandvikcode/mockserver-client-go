@@ -1,6 +1,3 @@
-# Global arguments (remember to use an ARG instruction in each stage to get the default)
-ARG executableName=flames-library-mockserver-client
-
 ###########################
 # Builder image (stage 1) #
 ###########################
@@ -23,6 +20,4 @@ WORKDIR ${GOPATH}/src/github.com/${repoName}/${projectName}
 COPY . .
 
 # Get dependencies and then lint
-RUN [ "make", "vendor", "lint" ]
-
-COPY vendor ./vendor
+RUN [ "make", "vendor", "lint", "test" ]
