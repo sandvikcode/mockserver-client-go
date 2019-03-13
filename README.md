@@ -1,12 +1,11 @@
-TODO: Super short summary needed for why we want this and some sample usage, see https://github.com/sandvikcode/flames-library-authentication. Plus a link to http://www.mock-server.com/
+# This library needs love
 
-TODO: add description
+#### TODO: Super short summary needed for why we want this and some sample usage, see https://github.com/sandvikcode/flames-library-authentication. Plus a link to http://www.mock-server.com/
 
-TODO: add doc comments
+#### TODO: add doc comments
 
-TODO: add examples
+#### TODO: add examples
 
-TOOD: add tests
+#### TOOD: add tests
 
-TODO: remove hardcoded JSONs
-
+#### TODO: remove hardcoded JSONs
