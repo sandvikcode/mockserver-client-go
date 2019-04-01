@@ -5,16 +5,22 @@ import (
 	"net/http"
 )
 
-// TODO: Linter is angry as you must document the API
+// ResponseBody sets the request body the Mock-Server will return when serving a matched response
 type ResponseBody struct {
 	Type   string `json:"type"`
 	String string `json:"string"`
 }
 
-// Delay will make Mock-Server return a response after a fixed wait period in seconds
+// Delay sets how long the Mock-Server will wait before serving a matched response
 type Delay struct {
 	TimeUnit string `json:"timeUnit"`
 	Value    int    `json:"value"`
+}
+
+// Times sets how many times the Mock-Server will serve a given request
+type Times struct {
+	RemainingTime int  `json:"remainingTimes"`
+	Unlimited     bool `json:"unlimited"`
 }
 
 type ActionResponse struct {
@@ -33,6 +39,7 @@ type RequestMatcher struct {
 type Expectation struct {
 	Request  *RequestMatcher `json:"httpRequest"`
 	Response *ActionResponse `json:"httpResponse,omitEmpty"`
+	Times    *Times          `json:"times"`
 }
 
 type ExpectationOption func(e *Expectation) *Expectation
@@ -94,12 +101,11 @@ func WhenRequestMethod(method string) ExpectationOption {
 	}
 }
 
-func ThenResponseDelay(delay int) ExpectationOption {
+func WhenTimes(times int) ExpectationOption {
 	return func(e *Expectation) *Expectation {
-		r := e.Response
-		r.Delay = &Delay{
-			TimeUnit: "SECONDS",
-			Value:    delay,
+		e.Times = &Times{
+			RemainingTime: times,
+			Unlimited:     false,
 		}
 		return e
 	}
@@ -125,6 +131,17 @@ func ThenResponseJSON(body string) ExpectationOption {
 		}
 		r.Headers["content-type"] = []string{"application/json"}
 
+		return e
+	}
+}
+
+func ThenResponseDelay(delay int) ExpectationOption {
+	return func(e *Expectation) *Expectation {
+		r := e.Response
+		r.Delay = &Delay{
+			TimeUnit: "SECONDS",
+			Value:    delay,
+		}
 		return e
 	}
 }
