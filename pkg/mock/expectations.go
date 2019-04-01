@@ -11,10 +11,17 @@ type ResponseBody struct {
 	String string `json:"string"`
 }
 
+// Delay will make Mock-Server return a response after a fixed wait period in seconds
+type Delay struct {
+	TimeUnit string `json:"timeUnit"`
+	Value    int    `json:"value"`
+}
+
 type ActionResponse struct {
 	Headers    map[string][]string `json:"headers,omitempty"`
 	StatusCode int                 `json:"statusCode"`
 	Body       *ResponseBody       `json:"body,omitempty"`
+	Delay      *Delay              `json:"delay,omitempty"`
 }
 
 type RequestMatcher struct {
@@ -83,6 +90,17 @@ func WhenRequestPath(path string) ExpectationOption {
 func WhenRequestMethod(method string) ExpectationOption {
 	return func(e *Expectation) *Expectation {
 		e.Request.Method = method
+		return e
+	}
+}
+
+func ThenResponseDelay(delay int) ExpectationOption {
+	return func(e *Expectation) *Expectation {
+		r := e.Response
+		r.Delay = &Delay{
+			TimeUnit: "SECONDS",
+			Value:    delay,
+		}
 		return e
 	}
 }
