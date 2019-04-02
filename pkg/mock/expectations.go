@@ -2,7 +2,6 @@ package mock
 
 import (
 	"fmt"
-	"net/http"
 )
 
 // ResponseBody sets the request body the Mock-Server will return when serving a matched response
@@ -25,7 +24,7 @@ type Times struct {
 
 type ActionResponse struct {
 	Headers    map[string][]string `json:"headers,omitempty"`
-	StatusCode int                 `json:"statusCode"`
+	StatusCode int                 `json:"statusCode,omitempty"`
 	Body       *ResponseBody       `json:"body,omitempty"`
 	Delay      *Delay              `json:"delay,omitempty"`
 }
@@ -38,8 +37,8 @@ type RequestMatcher struct {
 
 type Expectation struct {
 	Request  *RequestMatcher `json:"httpRequest"`
-	Response *ActionResponse `json:"httpResponse,omitEmpty"`
-	Times    *Times          `json:"times"`
+	Response *ActionResponse `json:"httpResponse,omitempty"`
+	Times    *Times          `json:"times,omitempty"`
 }
 
 type ExpectationOption func(e *Expectation) *Expectation
@@ -49,9 +48,7 @@ func CreateExpectation(opts ...ExpectationOption) *Expectation {
 		Request: &RequestMatcher{
 			Path: "/(.*)",
 		},
-		Response: &ActionResponse{
-			StatusCode: http.StatusOK,
-		},
+		Response: &ActionResponse{},
 	}
 
 	for _, opt := range opts {

@@ -30,6 +30,16 @@ func (hms *Client) AddExpectation(exp *Expectation) {
 	hms.callMock("expectation", string(msg))
 }
 
+func (hms *Client) Verify(v *Verification) {
+	msg, err := json.Marshal(v)
+	if err != nil {
+		require.NoError(hms.T, err,
+			"Failed to serialize mock server verification.")
+	}
+
+	hms.callMock("verify", string(msg))
+}
+
 // Clear some expectations for a given path in Mock-Server
 // TODO: refactor with a clear model
 // TODO: this could be part of expectations.go? http://www.mock-server.com/mock_server/clearing_and_resetting.html
