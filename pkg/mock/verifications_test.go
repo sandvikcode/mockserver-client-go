@@ -1,24 +1,33 @@
 package mock
 
-/*
+import (
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+)
+
 func TestVerifications(t *testing.T) {
 
 	// Define test table
 	testCases := []struct {
 		description  string
-		expectation  *Expectation
+		verification *Verification
 		expectedJSON string
 	}{
-		{"Verify the MockServer was called 5 times for a given path.", CreateExpectation(WhenRequestPath("/path"), CreateVerification(5,10)), `
+		{"Verify the MockServer was called at least 5 times, and at most 10 times, for a given path.", CreateVerification(CreateExpectation(WhenRequestPath("/path")), CreateVerify(5, 10)), `
 		{
 			"httpRequest": {
-				"path": "/path",
-				"method": "GET"
+				"path": "/path"
 			},
-			"httpResponse": {
-				"statusCode": 200
+			"times": {
+				"atLeast": 5,
+        		"atMost": 10
 			}
-		}`}
+		}`},
 	}
 
 	for _, tc := range testCases {
@@ -45,7 +54,7 @@ func TestVerifications(t *testing.T) {
 				BaseURL: ts.URL,
 				T:       t,
 			}
-			mockClient.AddExpectation(tc.expectation).AddVerification(tc.)
+			mockClient.AddVerification(tc.verification)
 		})
 	}
-}*/
+}
