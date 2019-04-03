@@ -43,6 +43,18 @@ func (hms *Client) AddVerification(v *Verification) {
 	hms.callMock("verify", string(msg))
 }
 
+/*
+// AddVerificationSequence adds a verification of a specific sequence of requests to MockServer
+func (hms *Client) AddVerificationSequence(v []*VerificationSequence) {
+	msg, err := json.Marshal(v)
+	if err != nil {
+		require.NoError(hms.T, err,
+			"Failed to serialize mock server verification sequence.")
+	}
+
+	hms.callMock("verifySequence", string(msg))
+}*/
+
 // Clear everything that matches a given path in MockServer
 func (hms *Client) Clear(path string) {
 	mockReqBody := fmt.Sprintf(`

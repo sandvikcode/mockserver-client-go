@@ -58,3 +58,57 @@ func TestVerifications(t *testing.T) {
 		})
 	}
 }
+/*
+func TestVerificationSequence(t *testing.T) {
+
+	// Define test table
+	testCases := []struct {
+		description          string
+		verificationSequence []*VerificationSequence
+		expectedJSON         string
+	}{
+		{"Verify the MockServer was called with these specific calls in this specific order.", CreateVerificationSequence(VerifyPath("/some/path/one"), VerifyPath("/some/path/two"), VerifyPath("/some/path/three")), `
+		[
+			{
+			"path": "/some/path/one"
+			},
+			{
+			"path": "/some/path/two"
+			},
+			{
+			"path": "/some/path/three"
+			}
+		]`},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			// Create a test server so we can inspect the JSON body sent by the mock-server client
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				body, err := ioutil.ReadAll(r.Body)
+				require.NoError(t, err, "Body reader must not return an error.")
+
+				//bodyMap := make(map[string]interface{})
+				//y := make([]interface{},0)
+				err = json.Unmarshal(body, &y)
+				require.NoError(t, err, "Body un-marshall must not return an error.")
+
+				//expectedMap := make(map[string]interface{})
+				x := make([]interface{},0)
+				err = json.Unmarshal([]byte(tc.expectedJSON), &x)
+				require.NoError(t, err, "Body un-marshall must not return an error.")
+
+				require.Equal(t, y, x)
+
+			}))
+			defer ts.Close()
+
+			mockClient := &Client{
+				BaseURL: ts.URL,
+				T:       t,
+			}
+			mockClient.AddVerificationSequence(tc.verificationSequence)
+		})
+	}
+}
+*/

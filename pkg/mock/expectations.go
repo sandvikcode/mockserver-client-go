@@ -13,9 +13,10 @@ type Expectation struct {
 
 // RequestMatcher is used to match which requests the expectation will be applied to
 type RequestMatcher struct {
-	Path    string              `json:"path,omitempty"`
-	Method  string              `json:"method,omitempty"`
-	Headers map[string][]string `json:"headers,omitempty"`
+	Path                  string              `json:"path,omitempty"`
+	Method                string              `json:"method,omitempty"`
+	Headers               map[string][]string `json:"headers,omitempty"`
+	QueryStringParameters map[string][]string `json:"queryStringParameters,omitempty"`
 }
 
 // ActionResponse defines what actions to take when a request is matched e.g. response, delay, forward etc.
@@ -72,6 +73,21 @@ func WhenRequestHeaders(headers map[string][]string) ExpectationOption {
 
 		for h, v := range headers {
 			e.Request.Headers[h] = v
+		}
+
+		return e
+	}
+}
+
+// WhenRequestQueryStringParameters creates an expectation based on required query string parameters
+func WhenRequestQueryStringParameters(qsp map[string][]string) ExpectationOption {
+	return func(e *Expectation) *Expectation {
+		if e.Request.QueryStringParameters == nil {
+			e.Request.QueryStringParameters = make(map[string][]string)
+		}
+
+		for q, v := range qsp {
+			e.Request.QueryStringParameters[q] = v
 		}
 
 		return e

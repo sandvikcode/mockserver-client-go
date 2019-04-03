@@ -38,6 +38,18 @@ func TestExpectations(t *testing.T) {
 				"statusCode": 200
 			}
 		}`},
+		{"Path and query string parameters should be matched and then 200 returned.", CreateExpectation(WhenRequestPath("/path"), WhenRequestQueryStringParameters(map[string][]string{"name": {"value"}}), ThenResponseStatus(http.StatusOK)), `
+		{
+			"httpRequest": {
+				"path": "/path",
+				"queryStringParameters" : {
+					"name" : [ "value" ]
+				}
+			},
+			"httpResponse": {
+				"statusCode": 200
+			}
+		}`},
 		{"Path and headers should be matched and then 200 returned.", CreateExpectation(WhenRequestPath("/path"), WhenRequestHeaders(map[string][]string{"name": {"value"}}), ThenResponseStatus(http.StatusOK)), `
 		{
 			"httpRequest": {
