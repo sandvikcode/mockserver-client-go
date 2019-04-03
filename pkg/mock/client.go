@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// Client wraps the testing context used for all interactions with MockServer
 type Client struct {
 	// testing type T
 	T *testing.T
@@ -20,6 +21,7 @@ type Client struct {
 	BaseURL string
 }
 
+// AddExpectation adds an expectation based on a request matcher to MockServer
 func (hms *Client) AddExpectation(exp *Expectation) {
 	msg, err := json.Marshal(exp)
 	if err != nil {
@@ -30,6 +32,7 @@ func (hms *Client) AddExpectation(exp *Expectation) {
 	hms.callMock("expectation", string(msg))
 }
 
+// AddVerification adds a verification of requests to MockServer
 func (hms *Client) AddVerification(v *Verification) {
 	msg, err := json.Marshal(v)
 	if err != nil {
@@ -40,7 +43,7 @@ func (hms *Client) AddVerification(v *Verification) {
 	hms.callMock("verify", string(msg))
 }
 
-// Clear some expectations for a given path in Mock-Server
+// Clear everything that matches a given path in MockServer
 func (hms *Client) Clear(path string) {
 	mockReqBody := fmt.Sprintf(`
 			{
@@ -50,7 +53,7 @@ func (hms *Client) Clear(path string) {
 	hms.callMock("clear", mockReqBody)
 }
 
-// Reset the entire Mock-Server, clearing all state
+// Reset the entire MockServer, clearing all state
 func (hms *Client) Reset() {
 	hms.callMock("reset", "")
 }
@@ -77,7 +80,7 @@ func (hms *Client) callMock(mockAPI, mockReqBody string) {
 	if err != nil {
 		require.NoError(hms.T, err, "Failed to send request to mock server.")
 	}
-	// Mock-server verification returns 202 on success and 406 on failure
+	// MockServer verification returns 202 on success and 406 on failure
 	if mockRes.StatusCode != http.StatusAccepted {
 		require.NoError(hms.T, err,
 			fmt.Sprintf("Mock server verification did not meet expectations and failed with status: %s", mockRes.Status))

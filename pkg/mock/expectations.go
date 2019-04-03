@@ -4,24 +4,21 @@ import (
 	"fmt"
 )
 
-// ResponseBody sets the request body the Mock-Server will return when serving a matched response
-type ResponseBody struct {
-	Type   string `json:"type"`
-	String string `json:"string"`
+// Expectation defines the complete request/response interaction for a given scenario
+type Expectation struct {
+	Request  *RequestMatcher `json:"httpRequest"`
+	Response *ActionResponse `json:"httpResponse,omitempty"`
+	Times    *Times          `json:"times,omitempty"`
 }
 
-// Delay sets how long the Mock-Server will wait before serving a matched response
-type Delay struct {
-	TimeUnit string `json:"timeUnit"`
-	Value    int    `json:"value"`
+// RequestMatcher is used to match which requests the expectation will be applied to
+type RequestMatcher struct {
+	Path    string              `json:"path,omitempty"`
+	Method  string              `json:"method,omitempty"`
+	Headers map[string][]string `json:"headers,omitempty"`
 }
 
-// Times sets how many times the Mock-Server will serve a given request
-type Times struct {
-	RemainingTime int  `json:"remainingTimes"`
-	Unlimited     bool `json:"unlimited"`
-}
-
+// ActionResponse defines what actions to take when a request is matched e.g. response, delay, forward etc.
 type ActionResponse struct {
 	Headers    map[string][]string `json:"headers,omitempty"`
 	StatusCode int                 `json:"statusCode,omitempty"`
@@ -29,20 +26,28 @@ type ActionResponse struct {
 	Delay      *Delay              `json:"delay,omitempty"`
 }
 
-type RequestMatcher struct {
-	Path    string              `json:"path,omitempty"`
-	Method  string              `json:"method,omitempty"`
-	Headers map[string][]string `json:"headers,omitempty"`
+// ResponseBody sets the request body the MockServer will return when serving a matched response
+type ResponseBody struct {
+	Type   string `json:"type"`
+	String string `json:"string"`
 }
 
-type Expectation struct {
-	Request  *RequestMatcher `json:"httpRequest"`
-	Response *ActionResponse `json:"httpResponse,omitempty"`
-	Times    *Times          `json:"times,omitempty"`
+// Times sets how many times the MockServer will serve a given request
+type Times struct {
+	RemainingTime int  `json:"remainingTimes"`
+	Unlimited     bool `json:"unlimited"`
 }
 
+// Delay sets how long the MockServer will wait before serving a matched response
+type Delay struct {
+	TimeUnit string `json:"timeUnit"`
+	Value    int    `json:"value"`
+}
+
+// ExpectationOption enables building expectations in many parts
 type ExpectationOption func(e *Expectation) *Expectation
 
+// CreateExpectation converts a number of expectation parts (options) into a single Expectation
 func CreateExpectation(opts ...ExpectationOption) *Expectation {
 	e := &Expectation{
 		Request: &RequestMatcher{
@@ -58,6 +63,7 @@ func CreateExpectation(opts ...ExpectationOption) *Expectation {
 	return e
 }
 
+// WhenRequestHeaders creates an expectation based on required request headers
 func WhenRequestHeaders(headers map[string][]string) ExpectationOption {
 	return func(e *Expectation) *Expectation {
 		if e.Request.Headers == nil {
@@ -72,6 +78,7 @@ func WhenRequestHeaders(headers map[string][]string) ExpectationOption {
 	}
 }
 
+// WhenRequestAuth creates an expectation based on a required Authorization request header
 func WhenRequestAuth(authToken string) ExpectationOption {
 	return func(e *Expectation) *Expectation {
 		if e.Request.Headers == nil {
@@ -84,6 +91,7 @@ func WhenRequestAuth(authToken string) ExpectationOption {
 	}
 }
 
+// WhenRequestPath creates an expectation based on a path
 func WhenRequestPath(path string) ExpectationOption {
 	return func(e *Expectation) *Expectation {
 		e.Request.Path = path
@@ -91,6 +99,7 @@ func WhenRequestPath(path string) ExpectationOption {
 	}
 }
 
+// WhenRequestMethod creates an expectation based on an HTTP method
 func WhenRequestMethod(method string) ExpectationOption {
 	return func(e *Expectation) *Expectation {
 		e.Request.Method = method
@@ -98,6 +107,7 @@ func WhenRequestMethod(method string) ExpectationOption {
 	}
 }
 
+// WhenTimes creates an expectation bounded by a limited number of calls
 func WhenTimes(times int) ExpectationOption {
 	return func(e *Expectation) *Expectation {
 		e.Times = &Times{
@@ -108,6 +118,7 @@ func WhenTimes(times int) ExpectationOption {
 	}
 }
 
+// ThenResponseStatus creates an action that returns an HTTP status code when a request is matched
 func ThenResponseStatus(statusCode int) ExpectationOption {
 	return func(e *Expectation) *Expectation {
 		e.Response.StatusCode = statusCode
@@ -115,6 +126,7 @@ func ThenResponseStatus(statusCode int) ExpectationOption {
 	}
 }
 
+// ThenResponseJSON creates an action that returns an HTTP body when a request is matched
 func ThenResponseJSON(body string) ExpectationOption {
 	return func(e *Expectation) *Expectation {
 		r := e.Response
@@ -132,6 +144,7 @@ func ThenResponseJSON(body string) ExpectationOption {
 	}
 }
 
+// ThenResponseDelay creates an action that delays returning an HTTP response when a request is matched
 func ThenResponseDelay(delay int) ExpectationOption {
 	return func(e *Expectation) *Expectation {
 		r := e.Response

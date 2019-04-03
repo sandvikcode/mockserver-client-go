@@ -1,12 +1,12 @@
 package mock
 
-// VerifyTimes defines how many times the Mock-Server can be called
+// VerifyTimes defines how many times the MockServer may be called
 type VerifyTimes struct {
 	AtLeast int `json:"atLeast,omitempty"`
 	AtMost  int `json:"atMost,omitempty"`
 }
 
-// Verification defines how many times the Mock-Server can be called for a given request pattern
+// Verification defines how many times the MockServer may be called for a given request pattern
 type Verification struct {
 	Request *RequestMatcher `json:"httpRequest"`
 	Times   *VerifyTimes    `json:"times,omitempty"`
