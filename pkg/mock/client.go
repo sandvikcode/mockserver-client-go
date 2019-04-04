@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// Client wraps the testing context used for all interactions with MockServer
 type Client struct {
 	// testing type T
 	T *testing.T
@@ -20,58 +21,61 @@ type Client struct {
 	BaseURL string
 }
 
-func (hms *Client) AddExpectation(exp *Expectation) {
+// AddExpectation adds an expectation based on a request matcher to MockServer
+func (c *Client) AddExpectation(exp *Expectation) {
 	msg, err := json.Marshal(exp)
 	if err != nil {
-		require.NoError(hms.T, err,
+		require.NoError(c.T, err,
 			"Failed to serialize mock server expectation.")
 	}
 
-	hms.callMock("expectation", string(msg))
+	c.callMock("expectation", string(msg))
 }
 
-// Clear some expectations for a given path in Mock-Server
-// TODO: refactor with a clear model
-// TODO: this could be part of expectations.go? http://www.mock-server.com/mock_server/clearing_and_resetting.html
-func (hms *Client) Clear(path string) {
+// AddVerification adds a verification of requests to MockServer
+func (c *Client) AddVerification(exp *Expectation) {
+	msg, err := json.Marshal(exp)
+	if err != nil {
+		require.NoError(c.T, err,
+			"Failed to serialize mock server verification.")
+	}
+
+	c.callMock("verify", string(msg))
+}
+
+/*
+// AddVerificationSequence adds a verification of a specific sequence of requests to MockServer
+func (c *Client) AddVerificationSequence(v []*VerificationSequence) {
+	msg, err := json.Marshal(v)
+	if err != nil {
+		require.NoError(c.T, err,
+			"Failed to serialize mock server verification sequence.")
+	}
+
+	c.callMock("verifySequence", string(msg))
+}
+*/
+
+// Clear everything that matches a given path in MockServer
+func (c *Client) Clear(path string) {
 	mockReqBody := fmt.Sprintf(`
 			{
 				"path": "%s"
 			}
 			`, path)
-	hms.callMock("clear", mockReqBody)
+	c.callMock("clear", mockReqBody)
 }
 
-// VerifyMinMax Mock-Server was called at least and at most N number of times. Note: -1 is infinite number of times.
-// TODO: refactor with a clear model
-// TODO: Move to verifications.go For the model we will have VerifyCount and VerifySequence, see http://www.mock-server.com/mock_server/verification.html
-func (hms *Client) VerifyMinMax(path string, atLeast int, atMost int) {
-	mockReqBody := fmt.Sprintf(`
-			{
-				"httpRequest": {
-					"path": "%s"
-				},
-				"times": {
-					"atLeast": %d,
-					"atMost": %d
-				}
-			}
-			`, path, atLeast, atMost)
-
-	hms.callMock("mockserver/verify", mockReqBody)
+// Reset the entire MockServer, clearing all state
+func (c *Client) Reset() {
+	c.callMock("reset", "")
 }
 
-// Reset the entire Mock-Server, clearing all state
-// TODO: This should be part of client as it clears everything..verifications, expectations etc
-func (hms *Client) Reset() {
-	hms.callMock("reset", "")
-}
-
-func (hms *Client) callMock(mockAPI, mockReqBody string) {
-	mockURL := fmt.Sprintf("%s/%s", hms.BaseURL, mockAPI)
+func (c *Client) callMock(mockAPI, mockReqBody string) {
+	mockURL := fmt.Sprintf("%s/%s", c.BaseURL, mockAPI)
 	// check url is valid
 	if _, err := url.ParseRequestURI(mockURL); err != nil {
-		require.NoError(hms.T, err,
+		require.NoError(c.T, err,
 			fmt.Sprintf("'%s' is not a valid mock server URL", mockURL))
 	}
 
@@ -83,15 +87,15 @@ func (hms *Client) callMock(mockAPI, mockReqBody string) {
 
 	mockReq, err := http.NewRequest("PUT", mockURL, reader)
 	if err != nil {
-		require.NoError(hms.T, err, "Failed to create request to mock server.")
+		require.NoError(c.T, err, "Failed to create request to mock server.")
 	}
 	mockRes, err := hc.Do(mockReq)
 	if err != nil {
-		require.NoError(hms.T, err, "Failed to send request to mock server.")
+		require.NoError(c.T, err, "Failed to send request to mock server.")
 	}
-	// Mock-server verification returns 202 on success and 406 on failure
+	// MockServer verification returns 202 on success and 406 on failure
 	if mockRes.StatusCode != http.StatusAccepted {
-		require.NoError(hms.T, err,
+		require.NoError(c.T, err,
 			fmt.Sprintf("Mock server verification did not meet expectations and failed with status: %s", mockRes.Status))
 	}
 }

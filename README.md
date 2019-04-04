@@ -1,13 +1,27 @@
-# This library needs love
+# flames-library-mockserver-client
 
-#### TODO: Super short summary needed for why we want this and some sample usage, see https://github.com/sandvikcode/flames-library-authentication. Plus a link to http://www.mock-server.com/
+The mockserver client is a golang client for use with the fantastic http://www.mock-server.com/ HTTP mock server.
 
-#### TODO: add doc comments
+Usage:
+* Import the library `import "github.com/sandvikcode/flames-library-mockserver-client/pkg/mock"`
 
-#### TODO: add examples
+Example:
+```
+mockServer := mock.Client{
+    T: t, 
+    BaseURL: os.Getenv("MOCKSERVER_HOST")
+}
 
-#### TOOD: add tests
+mockServer.AddExpectation(
+    mock.CreateExpectation(
+        mock.WhenRequestPath("/(.*)"),
+        mock.ThenResponseStatus(http.StatusOK),
+    ))
 
-#### TODO: remove hardcoded JSONs
+defer mockServer.Clear("/(.*)")
+```
 
-#### TODO: opensource
+Links:
+* Expectations - http://www.mock-server.com/mock_server/creating_expectations.html
+* Verifications - http://www.mock-server.com/mock_server/verification.html
+* Clearing & Resetting http://www.mock-server.com/mock_server/clearing_and_resetting.html
