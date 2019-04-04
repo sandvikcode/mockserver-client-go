@@ -40,6 +40,7 @@ Expectation Defaults:
 * unlimited calls will respond to a match
 * calls are not delayed
 * status of matched calls is 200 OK
+* body of matched calls is empty
 
 Verification Defaults:
 * matched request occurs once i.e. at 1 least call and at most 1 call 
