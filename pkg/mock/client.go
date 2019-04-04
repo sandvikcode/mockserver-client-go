@@ -43,6 +43,7 @@ func (c *Client) AddVerification(exp *Expectation) {
 	c.callMock("verify", string(msg))
 }
 
+/*
 // AddVerificationSequence adds a verification of a specific sequence of requests to MockServer
 func (c *Client) AddVerificationSequence(v []*VerificationSequence) {
 	msg, err := json.Marshal(v)
@@ -53,6 +54,7 @@ func (c *Client) AddVerificationSequence(v []*VerificationSequence) {
 
 	c.callMock("verifySequence", string(msg))
 }
+*/
 
 // Clear everything that matches a given path in MockServer
 func (c *Client) Clear(path string) {
