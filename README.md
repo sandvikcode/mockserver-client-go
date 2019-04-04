@@ -1,21 +1,21 @@
-# flames-library-mockserver-client
+# mockserver-client-go
 
 The mockserver client is a golang client for use with the fantastic http://www.mock-server.com/ HTTP mock server.
 
 Usage:
-* Import the library `import "github.com/sandvikcode/flames-library-mockserver-client/pkg/mock"`
+* Import the library `import "github.com/sandvikcode/mockserver-client-go/pkg/mockclient"`
 
 Example:
 ```
-mockServer := mock.Client{
+mockServer := mockclient.Client{
     T: t, 
-    BaseURL: os.Getenv("MOCKSERVER_HOST")
+    BaseURL: os.Getenv("MOCKSERVER_HOST"),
 }
 
 mockServer.AddExpectation(
-    mock.CreateExpectation(
-        mock.WhenRequestPath("/(.*)"),
-        mock.ThenResponseStatus(http.StatusOK),
+    mockclient.CreateExpectation(
+        mockclient.WhenRequestPath("/(.*)"),
+        mockclient.ThenResponseStatus(http.StatusOK),
     ))
 
 defer mockServer.Clear("/(.*)")

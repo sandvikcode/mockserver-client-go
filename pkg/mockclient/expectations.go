@@ -1,4 +1,4 @@
-package mock
+package mockclient
 
 import (
 	"fmt"
