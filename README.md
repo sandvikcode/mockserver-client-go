@@ -5,7 +5,7 @@ The mockserver client is a golang client for use with the fantastic http://www.m
 Usage:
 * Import the library `import "github.com/sandvikcode/mockserver-client-go/pkg/mockclient"`
 
-Example:
+Create an expectation example:
 ```
 mockServer := mockclient.Client{
     T: t, 
@@ -20,6 +20,29 @@ mockServer.AddExpectation(
 
 defer mockServer.Clear("/(.*)")
 ```
+
+Create a verification example:
+```
+mockServer := mockclient.Client{
+    T: t, 
+    BaseURL: os.Getenv("MOCKSERVER_HOST"),
+}
+
+mockServer.AddVerification(
+    mockclient.CreateVerification(
+        mockclient.WhenRequestPath("/v1/jobs/(.*)"),
+        mockclient.ThenAtLeastCalls(2),
+        mockclient.ThenAtMostCalls(4),
+    ))
+```
+
+Expectation Defaults:
+* unlimited calls will respond to a match
+* calls are not delayed
+* status of matched calls is 200 OK
+
+Verification Defaults:
+* matched request occurs once i.e. at 1 least call and at most 1 call 
 
 Links:
 * Expectations - http://www.mock-server.com/mock_server/creating_expectations.html
