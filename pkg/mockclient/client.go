@@ -1,8 +1,9 @@
-package mock
+package mockclient
 
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"testing"
 	"time"
 
@@ -10,6 +11,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -91,11 +93,18 @@ func (c *Client) callMock(mockAPI, mockReqBody string) {
 	}
 	mockRes, err := hc.Do(mockReq)
 	if err != nil {
-		require.NoError(c.T, err, "Failed to send request to mock server.")
+		require.NoError(c.T, err, "Failed to send request to MockServer.")
 	}
-	// MockServer verification returns 202 on success and 406 on failure
-	if mockRes.StatusCode != http.StatusAccepted {
-		require.NoError(c.T, err,
-			fmt.Sprintf("Mock server verification did not meet expectations and failed with status: %s", mockRes.Status))
+
+	// all went well so return (clears & /reset return 200 whilst /verify & /expectation return 201)
+	if mockRes.StatusCode >= 200 && mockRes.StatusCode <= 299 {
+		return
 	}
+
+	// something went wrong so return the error message (Note: MockServer /verify returns 406 on failure)
+	b, err := ioutil.ReadAll(mockRes.Body)
+	if err != nil {
+		assert.Fail(c.T, fmt.Sprintf("MockServer call failed with status: %s", mockRes.Status))
+	}
+	assert.Fail(c.T, fmt.Sprintf("MockServer call to /%s failed with status: %s. Error message from MockServer is: %s", mockAPI, mockRes.Status, string(b)))
 }
