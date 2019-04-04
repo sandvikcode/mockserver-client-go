@@ -1,4 +1,4 @@
-package mock
+package mockclient
 
 // VerificationSequence defines a specific sequence of calls to MockServer
 type VerificationSequence struct {
@@ -13,7 +13,7 @@ func CreateVerification(opts ...ExpectationOption) *Expectation {
 			Path: "/(.*)",
 		},
 		Times: &Times{
-			AtLeast:  1,
+			AtLeast: 1,
 			AtMost:  1,
 		},
 	}
