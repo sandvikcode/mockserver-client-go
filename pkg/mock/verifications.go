@@ -1,40 +1,46 @@
 package mock
 
-// VerifyTimes defines how many times the MockServer may be called
-type VerifyTimes struct {
-	AtLeast int `json:"atLeast,omitempty"`
-	AtMost  int `json:"atMost,omitempty"`
-}
-
-// Verification defines how many times the MockServer may be called for a given request pattern
-type Verification struct {
-	Request *RequestMatcher `json:"httpRequest"`
-	Times   *VerifyTimes    `json:"times,omitempty"`
-}
-
 // VerificationSequence defines a specific sequence of calls to MockServer
 type VerificationSequence struct {
 	Path string `json:"path,omitempty"`
 }
 
-// CreateVerification creates a verification for a given expectation
-func CreateVerification(e *Expectation, vt *VerifyTimes) *Verification {
-	v := &Verification{
-		Request: e.Request,
-		Times:   vt,
+// CreateVerification converts a number of expectation parts (options) into a single Expectation
+func CreateVerification(opts ...ExpectationOption) *Expectation {
+	// Specify some defaults if no options are set
+	e := &Expectation{
+		Request: &RequestMatcher{
+			Path: "/(.*)",
+		},
+		Times: &Times{
+			AtLeast:  1,
+			AtMost:  1,
+		},
 	}
-	return v
+	// Append all options that are set (discard defaults)
+	for _, opt := range opts {
+		e = opt(e)
+	}
+
+	return e
 }
 
-// CreateVerify creates a verification that bounds the number of times MockServer should have been called
-// Note: -1 is infinite number of times.
-func CreateVerify(min, max int) *VerifyTimes {
-	vt := &VerifyTimes{
-		AtLeast: min,
-		AtMost:  max,
+// ThenAtLeastCalls creates a verification that a matching call was received at least x times by MockServer
+func ThenAtLeastCalls(times int) ExpectationOption {
+	return func(v *Expectation) *Expectation {
+		v.Times.AtLeast = times
+		return v
 	}
-	return vt
 }
+
+// ThenAtMostCalls creates a verification that a matching call was received at most x times by MockServer
+func ThenAtMostCalls(times int) ExpectationOption {
+	return func(v *Expectation) *Expectation {
+		v.Times.AtMost = times
+		return v
+	}
+}
+
 /*
 // VerificationOption enables building verifications in many parts
 type VerificationOption func(e *VerificationSequence) *VerificationSequence

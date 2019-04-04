@@ -15,17 +15,37 @@ func TestVerifications(t *testing.T) {
 	// Define test table
 	testCases := []struct {
 		description  string
-		verification *Verification
+		expectation  *Expectation
 		expectedJSON string
 	}{
-		{"Verify the MockServer was called at least 5 times, and at most 10 times, for a given path.", CreateVerification(CreateExpectation(WhenRequestPath("/path")), CreateVerify(5, 10)), `
+		{"Verify the MockServer was called at least 1 times, and at most 1 times, for a given path, by using the defaults.", CreateVerification(WhenRequestPath("/path")), `
+		{
+			"httpRequest": {
+				"path": "/path"
+			},
+			"times": {
+				"atLeast": 1,
+        	    "atMost": 1
+			}
+		}`},
+		{"Verify the MockServer was called at least 0 times, and at most 1 times, for a given path, by using the default atMost.", CreateVerification(WhenRequestPath("/path"), ThenAtLeastCalls(1)), `
+		{
+			"httpRequest": {
+				"path": "/path"
+			},
+			"times": {
+				"atLeast": 1,
+        	    "atMost": 1
+			}
+		}`},
+		{"Verify the MockServer was called at least 5 times, and at most 10 times, for a given path.", CreateVerification(WhenRequestPath("/path"), ThenAtLeastCalls(5), ThenAtMostCalls(10)), `
 		{
 			"httpRequest": {
 				"path": "/path"
 			},
 			"times": {
 				"atLeast": 5,
-        		"atMost": 10
+        	    "atMost": 10
 			}
 		}`},
 	}
@@ -45,7 +65,7 @@ func TestVerifications(t *testing.T) {
 				err = json.Unmarshal([]byte(tc.expectedJSON), &expectedMap)
 				require.NoError(t, err, "Body un-marshall must not return an error.")
 
-				require.Equal(t, bodyMap, expectedMap)
+				require.Equal(t, expectedMap, bodyMap)
 
 			}))
 			defer ts.Close()
@@ -54,10 +74,11 @@ func TestVerifications(t *testing.T) {
 				BaseURL: ts.URL,
 				T:       t,
 			}
-			mockClient.AddVerification(tc.verification)
+			mockClient.AddVerification(tc.expectation)
 		})
 	}
 }
+
 /*
 func TestVerificationSequence(t *testing.T) {
 
@@ -88,17 +109,15 @@ func TestVerificationSequence(t *testing.T) {
 				body, err := ioutil.ReadAll(r.Body)
 				require.NoError(t, err, "Body reader must not return an error.")
 
-				//bodyMap := make(map[string]interface{})
-				//y := make([]interface{},0)
-				err = json.Unmarshal(body, &y)
+				var bodyMap []map[string]interface{}
+				err = json.Unmarshal(body, &bodyMap)
 				require.NoError(t, err, "Body un-marshall must not return an error.")
 
-				//expectedMap := make(map[string]interface{})
-				x := make([]interface{},0)
-				err = json.Unmarshal([]byte(tc.expectedJSON), &x)
+				var expectedMap []map[string]interface{}
+				err = json.Unmarshal([]byte(tc.expectedJSON), &expectedMap)
 				require.NoError(t, err, "Body un-marshall must not return an error.")
 
-				require.Equal(t, y, x)
+				require.Equal(t, expectedMap, bodyMap)
 
 			}))
 			defer ts.Close()

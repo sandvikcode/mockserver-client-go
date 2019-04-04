@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"time"
 
 	"testing"
 
@@ -74,7 +75,7 @@ func TestExpectations(t *testing.T) {
 				"statusCode": 200
 			}
 		}`},
-		{"Path should be matched and then a specific body returned.", CreateExpectation(WhenRequestPath("/path"), ThenResponseJSON(`{"key" : "value"}`)), `
+		{"Path should be matched and then a specific JSON body returned.", CreateExpectation(WhenRequestPath("/path"), ThenResponseJSON(`{"key" : "value"}`)), `
 		{
 			"httpRequest": {
 				"path": "/path"
@@ -89,7 +90,22 @@ func TestExpectations(t *testing.T) {
 				}
 			}
 		}`},
-		{"Path and method should be matched and then 200 returned after 5 seconds.", CreateExpectation(WhenRequestPath("/path"), ThenResponseDelay(5), ThenResponseStatus(http.StatusOK)), `
+		{"Path should be matched and then a specific text body returned.", CreateExpectation(WhenRequestPath("/path"), ThenResponseText(`Random string`)), `
+		{
+			"httpRequest": {
+				"path": "/path"
+			},
+			"httpResponse": {
+				"headers": {
+					"content-type": ["text/plain; charset=utf-16"]
+				},
+				"body": {
+					"type" : "STRING",
+					"string" : "Random string"
+				}
+			}
+		}`},
+		{"Path and method should be matched and then 200 returned after 5 seconds.", CreateExpectation(WhenRequestPath("/path"), ThenResponseDelay(5*time.Second), ThenResponseStatus(http.StatusOK)), `
 		{
 			"httpRequest": {
 				"path": "/path"
@@ -97,8 +113,8 @@ func TestExpectations(t *testing.T) {
 			"httpResponse": {
 				"statusCode": 200,
 				"delay": {
-					"timeUnit": "SECONDS",
-					"value": 5
+					"timeUnit": "MILLISECONDS",
+					"value": 5000
 				}
 			}
 		}`},
@@ -132,7 +148,7 @@ func TestExpectations(t *testing.T) {
 				err = json.Unmarshal([]byte(tc.expectedJSON), &expectedMap)
 				require.NoError(t, err, "Body un-marshall must not return an error.")
 
-				require.Equal(t, bodyMap, expectedMap)
+				require.Equal(t, expectedMap, bodyMap)
 
 			}))
 			defer ts.Close()

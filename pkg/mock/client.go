@@ -22,59 +22,58 @@ type Client struct {
 }
 
 // AddExpectation adds an expectation based on a request matcher to MockServer
-func (hms *Client) AddExpectation(exp *Expectation) {
+func (c *Client) AddExpectation(exp *Expectation) {
 	msg, err := json.Marshal(exp)
 	if err != nil {
-		require.NoError(hms.T, err,
+		require.NoError(c.T, err,
 			"Failed to serialize mock server expectation.")
 	}
 
-	hms.callMock("expectation", string(msg))
+	c.callMock("expectation", string(msg))
 }
 
 // AddVerification adds a verification of requests to MockServer
-func (hms *Client) AddVerification(v *Verification) {
-	msg, err := json.Marshal(v)
+func (c *Client) AddVerification(exp *Expectation) {
+	msg, err := json.Marshal(exp)
 	if err != nil {
-		require.NoError(hms.T, err,
+		require.NoError(c.T, err,
 			"Failed to serialize mock server verification.")
 	}
 
-	hms.callMock("verify", string(msg))
+	c.callMock("verify", string(msg))
 }
 
-/*
 // AddVerificationSequence adds a verification of a specific sequence of requests to MockServer
-func (hms *Client) AddVerificationSequence(v []*VerificationSequence) {
+func (c *Client) AddVerificationSequence(v []*VerificationSequence) {
 	msg, err := json.Marshal(v)
 	if err != nil {
-		require.NoError(hms.T, err,
+		require.NoError(c.T, err,
 			"Failed to serialize mock server verification sequence.")
 	}
 
-	hms.callMock("verifySequence", string(msg))
-}*/
+	c.callMock("verifySequence", string(msg))
+}
 
 // Clear everything that matches a given path in MockServer
-func (hms *Client) Clear(path string) {
+func (c *Client) Clear(path string) {
 	mockReqBody := fmt.Sprintf(`
 			{
 				"path": "%s"
 			}
 			`, path)
-	hms.callMock("clear", mockReqBody)
+	c.callMock("clear", mockReqBody)
 }
 
 // Reset the entire MockServer, clearing all state
-func (hms *Client) Reset() {
-	hms.callMock("reset", "")
+func (c *Client) Reset() {
+	c.callMock("reset", "")
 }
 
-func (hms *Client) callMock(mockAPI, mockReqBody string) {
-	mockURL := fmt.Sprintf("%s/%s", hms.BaseURL, mockAPI)
+func (c *Client) callMock(mockAPI, mockReqBody string) {
+	mockURL := fmt.Sprintf("%s/%s", c.BaseURL, mockAPI)
 	// check url is valid
 	if _, err := url.ParseRequestURI(mockURL); err != nil {
-		require.NoError(hms.T, err,
+		require.NoError(c.T, err,
 			fmt.Sprintf("'%s' is not a valid mock server URL", mockURL))
 	}
 
@@ -86,15 +85,15 @@ func (hms *Client) callMock(mockAPI, mockReqBody string) {
 
 	mockReq, err := http.NewRequest("PUT", mockURL, reader)
 	if err != nil {
-		require.NoError(hms.T, err, "Failed to create request to mock server.")
+		require.NoError(c.T, err, "Failed to create request to mock server.")
 	}
 	mockRes, err := hc.Do(mockReq)
 	if err != nil {
-		require.NoError(hms.T, err, "Failed to send request to mock server.")
+		require.NoError(c.T, err, "Failed to send request to mock server.")
 	}
 	// MockServer verification returns 202 on success and 406 on failure
 	if mockRes.StatusCode != http.StatusAccepted {
-		require.NoError(hms.T, err,
+		require.NoError(c.T, err,
 			fmt.Sprintf("Mock server verification did not meet expectations and failed with status: %s", mockRes.Status))
 	}
 }

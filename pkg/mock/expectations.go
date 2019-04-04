@@ -2,6 +2,7 @@ package mock
 
 import (
 	"fmt"
+	"time"
 )
 
 // Expectation defines the complete request/response interaction for a given scenario
@@ -27,16 +28,19 @@ type ActionResponse struct {
 	Delay      *Delay              `json:"delay,omitempty"`
 }
 
-// ResponseBody sets the request body the MockServer will return when serving a matched response
+// ResponseBody defines the request body the MockServer will return when serving a matched response
 type ResponseBody struct {
 	Type   string `json:"type"`
 	String string `json:"string"`
 }
 
-// Times sets how many times the MockServer will serve a given request
+// Times defines how many times the MockServer will serve a given request in expectation mode whilst
+// in verification mode defines the expected number of calls
 type Times struct {
-	RemainingTime int  `json:"remainingTimes"`
-	Unlimited     bool `json:"unlimited"`
+	AtLeast        int   `json:"atLeast,omitempty"`        // valid for verifications only
+	AtMost         int   `json:"atMost,omitempty"`         // valid for verifications only
+	RemainingTimes int   `json:"remainingTimes,omitempty"` // valid for expectations only
+	Unlimited      *bool `json:"unlimited,omitempty"`      // valid for expectations only
 }
 
 // Delay sets how long the MockServer will wait before serving a matched response
@@ -50,6 +54,7 @@ type ExpectationOption func(e *Expectation) *Expectation
 
 // CreateExpectation converts a number of expectation parts (options) into a single Expectation
 func CreateExpectation(opts ...ExpectationOption) *Expectation {
+	// Specify some defaults if no options are set
 	e := &Expectation{
 		Request: &RequestMatcher{
 			Path: "/(.*)",
@@ -57,6 +62,7 @@ func CreateExpectation(opts ...ExpectationOption) *Expectation {
 		Response: &ActionResponse{},
 	}
 
+	// Append all options that are set (discard defaults)
 	for _, opt := range opts {
 		e = opt(e)
 	}
@@ -127,8 +133,8 @@ func WhenRequestMethod(method string) ExpectationOption {
 func WhenTimes(times int) ExpectationOption {
 	return func(e *Expectation) *Expectation {
 		e.Times = &Times{
-			RemainingTime: times,
-			Unlimited:     false,
+			RemainingTimes: times,
+			Unlimited:      newBool(false),
 		}
 		return e
 	}
@@ -142,7 +148,7 @@ func ThenResponseStatus(statusCode int) ExpectationOption {
 	}
 }
 
-// ThenResponseJSON creates an action that returns an HTTP body when a request is matched
+// ThenResponseJSON creates an action that returns an HTTP body as JSON when a request is matched
 func ThenResponseJSON(body string) ExpectationOption {
 	return func(e *Expectation) *Expectation {
 		r := e.Response
@@ -160,14 +166,37 @@ func ThenResponseJSON(body string) ExpectationOption {
 	}
 }
 
+// ThenResponseText creates an action that returns an HTTP body as text when a request is matched
+func ThenResponseText(body string) ExpectationOption {
+	return func(e *Expectation) *Expectation {
+		r := e.Response
+		r.Body = &ResponseBody{
+			Type:   "STRING",
+			String: body,
+		}
+
+		if r.Headers == nil {
+			r.Headers = make(map[string][]string)
+		}
+		r.Headers["content-type"] = []string{"text/plain; charset=utf-16"}
+
+		return e
+	}
+}
+
 // ThenResponseDelay creates an action that delays returning an HTTP response when a request is matched
-func ThenResponseDelay(delay int) ExpectationOption {
+func ThenResponseDelay(delay time.Duration) ExpectationOption {
 	return func(e *Expectation) *Expectation {
 		r := e.Response
 		r.Delay = &Delay{
-			TimeUnit: "SECONDS",
-			Value:    delay,
+			TimeUnit: "MILLISECONDS",
+			Value:    int(delay.Nanoseconds() / 1e6),
 		}
 		return e
 	}
+}
+
+func newBool(value bool) *bool {
+    b := value
+    return &b
 }
