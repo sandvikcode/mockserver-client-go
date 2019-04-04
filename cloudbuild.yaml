@@ -4,4 +4,4 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', '${_LIBRARY_NAME}', '.', '--cache-from', 'eu.gcr.io/$PROJECT_ID/${_LIBRARY_NAME}']
 substitutions:
-  _LIBRARY_NAME: flames-library-mockserver-client
+  _LIBRARY_NAME: mockserver-client-go
