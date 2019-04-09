@@ -37,8 +37,8 @@ type ResponseBody struct {
 // Times defines how many times the MockServer will serve a given request in expectation mode whilst
 // in verification mode defines the expected number of calls
 type Times struct {
-	AtLeast        int   `json:"atLeast,omitempty"`        // valid for verifications only
-	AtMost         int   `json:"atMost,omitempty"`         // valid for verifications only
+	AtLeast        *int  `json:"atLeast,omitempty"`        // valid for verifications only
+	AtMost         *int  `json:"atMost,omitempty"`         // valid for verifications only
 	RemainingTimes int   `json:"remainingTimes,omitempty"` // valid for expectations only
 	Unlimited      *bool `json:"unlimited,omitempty"`      // valid for expectations only
 }
@@ -197,6 +197,6 @@ func ThenResponseDelay(delay time.Duration) ExpectationOption {
 }
 
 func newBool(value bool) *bool {
-    b := value
-    return &b
+	b := value
+	return &b
 }
