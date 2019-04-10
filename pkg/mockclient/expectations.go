@@ -134,7 +134,7 @@ func WhenTimes(times int) ExpectationOption {
 	return func(e *Expectation) *Expectation {
 		e.Times = &Times{
 			RemainingTimes: times,
-			Unlimited:      newBool(false),
+			Unlimited:      boolPointer(false),
 		}
 		return e
 	}
@@ -196,7 +196,7 @@ func ThenResponseDelay(delay time.Duration) ExpectationOption {
 	}
 }
 
-func newBool(value bool) *bool {
+func boolPointer(value bool) *bool {
 	b := value
 	return &b
 }
