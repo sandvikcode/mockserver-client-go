@@ -28,13 +28,13 @@ func TestVerifications(t *testing.T) {
         	    "atMost": 1
 			}
 		}`},
-		{"Verify the MockServer was called at least 0 times, and at most 1 times, for a given path, by using the default atMost.", CreateVerification(WhenRequestPath("/path"), ThenAtLeastCalls(1)), `
+		{"Verify the MockServer was called at least 0 times, and at most 1 times, for a given path, by using the default atMost.", CreateVerification(WhenRequestPath("/path"), ThenAtLeastCalls(0)), `
 		{
 			"httpRequest": {
 				"path": "/path"
 			},
 			"times": {
-				"atLeast": 1,
+				"atLeast": 0,
         	    "atMost": 1
 			}
 		}`},

@@ -13,8 +13,8 @@ func CreateVerification(opts ...ExpectationOption) *Expectation {
 			Path: "/(.*)",
 		},
 		Times: &Times{
-			AtLeast: 1,
-			AtMost:  1,
+			AtLeast: integerPointer(1),
+			AtMost:  integerPointer(1),
 		},
 	}
 	// Append all options that are set (discard defaults)
@@ -28,7 +28,7 @@ func CreateVerification(opts ...ExpectationOption) *Expectation {
 // ThenAtLeastCalls creates a verification that a matching call was received at least x times by MockServer
 func ThenAtLeastCalls(times int) ExpectationOption {
 	return func(v *Expectation) *Expectation {
-		v.Times.AtLeast = times
+		v.Times.AtLeast = integerPointer(times)
 		return v
 	}
 }
@@ -36,7 +36,7 @@ func ThenAtLeastCalls(times int) ExpectationOption {
 // ThenAtMostCalls creates a verification that a matching call was received at most x times by MockServer
 func ThenAtMostCalls(times int) ExpectationOption {
 	return func(v *Expectation) *Expectation {
-		v.Times.AtMost = times
+		v.Times.AtMost = integerPointer(times)
 		return v
 	}
 }
@@ -63,3 +63,7 @@ func VerifyPath(path string) VerificationOption {
 	}
 }
 */
+
+func integerPointer(i int) *int {
+	return &i
+}
