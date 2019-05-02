@@ -28,6 +28,17 @@ func TestVerifications(t *testing.T) {
         	    "atMost": 1
 			}
 		}`},
+		{"Verify the MockServer was called at least 1 times, and at most 1 times, for a given path and given HTTP method, by using the defaults.", CreateVerification(WhenRequestPath("/path"), WhenRequestMethod("GET")), `
+		{
+			"httpRequest": {
+				"path": "/path",
+				"method": "GET"
+			},
+			"times": {
+				"atLeast": 1,
+        	    "atMost": 1
+			}
+		}`},
 		{"Verify the MockServer was called at least 0 times, and at most 1 times, for a given path, by using the default atMost.", CreateVerification(WhenRequestPath("/path"), ThenAtLeastCalls(0)), `
 		{
 			"httpRequest": {
@@ -83,11 +94,11 @@ func TestVerificationSequence(t *testing.T) {
 
 	// Define test table
 	testCases := []struct {
-		description          string
-		verificationSequence *VerificationSequence
-		expectedJSON         string
+		description  string
+		expectations []*Expectation
+		expectedJSON string
 	}{
-		{"Verify the MockServer was called with these specific calls in this specific order.", CreateVerificationSequence(WhenRequestPath("/some/path/one"), WhenRequestPath("/some/path/two"), WhenRequestPath("/some/path/three")), `
+		{"Verify the MockServer was called with these specific calls in this specific order.", []*Expectation{CreateVerification(WhenRequestPath("/some/path/one")), CreateVerification(WhenRequestPath("/some/path/two")), CreateVerification(WhenRequestPath("/some/path/three"), WhenRequestMethod("POST"))}, `
 		{
 			"httpRequests": [
 				{
@@ -97,7 +108,8 @@ func TestVerificationSequence(t *testing.T) {
 					"path": "/some/path/two"
 				},
 				{
-					"path": "/some/path/three"
+					"path": "/some/path/three",
+					"method": "POST"
 				}
 			]
 		}`},
@@ -127,7 +139,7 @@ func TestVerificationSequence(t *testing.T) {
 				BaseURL: ts.URL,
 				T:       t,
 			}
-			mockClient.AddVerificationSequence(tc.verificationSequence)
+			mockClient.AddVerificationSequence(tc.expectations...)
 		})
 	}
 }

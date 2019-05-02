@@ -27,36 +27,18 @@ func CreateVerification(opts ...ExpectationOption) *Expectation {
 
 // ThenAtLeastCalls creates a verification that a matching call was received at least x times by MockServer
 func ThenAtLeastCalls(times int) ExpectationOption {
-	return func(v *Expectation) *Expectation {
-		v.Times.AtLeast = integerPointer(times)
-		return v
+	return func(e *Expectation) *Expectation {
+		e.Times.AtLeast = integerPointer(times)
+		return e
 	}
 }
 
 // ThenAtMostCalls creates a verification that a matching call was received at most x times by MockServer
 func ThenAtMostCalls(times int) ExpectationOption {
-	return func(v *Expectation) *Expectation {
-		v.Times.AtMost = integerPointer(times)
-		return v
+	return func(e *Expectation) *Expectation {
+		e.Times.AtMost = integerPointer(times)
+		return e
 	}
-}
-
-// CreateVerificationSequence creates verifications for a given expectation sequence
-func CreateVerificationSequence(opts ...ExpectationOption) *VerificationSequence {
-
-	eArray := make([]*Expectation, 0)
-	for _, opt := range opts {
-		e := &Expectation{
-			Request: &RequestMatcher{},
-		}
-		eArray = append(eArray, opt(e))
-	}
-	//TODO: tidy up
-	vs := &VerificationSequence{}
-	for _, item := range eArray {
-		vs.Requests = append(vs.Requests, item.Request)
-	}
-	return vs
 }
 
 func integerPointer(i int) *int {

@@ -46,7 +46,12 @@ func (c *Client) AddVerification(exp *Expectation) {
 }
 
 // AddVerificationSequence adds a verification of a specific sequence of requests to MockServer
-func (c *Client) AddVerificationSequence(vs *VerificationSequence) {
+func (c *Client) AddVerificationSequence(exps ...*Expectation) {
+	vs := &VerificationSequence{}
+	for _, exp := range exps {
+		// Only request part of the expectation will be used for verification sequences
+		vs.Requests = append(vs.Requests, exp.Request)
+	}
 	msg, err := json.Marshal(vs)
 	if err != nil {
 		require.NoError(c.T, err,
