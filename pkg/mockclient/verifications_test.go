@@ -79,27 +79,28 @@ func TestVerifications(t *testing.T) {
 	}
 }
 
-/*
 func TestVerificationSequence(t *testing.T) {
 
 	// Define test table
 	testCases := []struct {
 		description          string
-		verificationSequence []*VerificationSequence
+		verificationSequence *VerificationSequence
 		expectedJSON         string
 	}{
-		{"Verify the MockServer was called with these specific calls in this specific order.", CreateVerificationSequence(VerifyPath("/some/path/one"), VerifyPath("/some/path/two"), VerifyPath("/some/path/three")), `
-		[
-			{
-			"path": "/some/path/one"
-			},
-			{
-			"path": "/some/path/two"
-			},
-			{
-			"path": "/some/path/three"
-			}
-		]`},
+		{"Verify the MockServer was called with these specific calls in this specific order.", CreateVerificationSequence(WhenRequestPath("/some/path/one"), WhenRequestPath("/some/path/two"), WhenRequestPath("/some/path/three")), `
+		{
+			"httpRequests": [
+				{
+					"path": "/some/path/one"
+				},
+				{
+					"path": "/some/path/two"
+				},
+				{
+					"path": "/some/path/three"
+				}
+			]
+		}`},
 	}
 
 	for _, tc := range testCases {
@@ -109,11 +110,11 @@ func TestVerificationSequence(t *testing.T) {
 				body, err := ioutil.ReadAll(r.Body)
 				require.NoError(t, err, "Body reader must not return an error.")
 
-				var bodyMap []map[string]interface{}
+				bodyMap := make(map[string]interface{})
 				err = json.Unmarshal(body, &bodyMap)
 				require.NoError(t, err, "Body un-marshall must not return an error.")
 
-				var expectedMap []map[string]interface{}
+				expectedMap := make(map[string]interface{})
 				err = json.Unmarshal([]byte(tc.expectedJSON), &expectedMap)
 				require.NoError(t, err, "Body un-marshall must not return an error.")
 
@@ -130,4 +131,3 @@ func TestVerificationSequence(t *testing.T) {
 		})
 	}
 }
-*/

@@ -45,10 +45,9 @@ func (c *Client) AddVerification(exp *Expectation) {
 	c.callMock("verify", string(msg))
 }
 
-/*
 // AddVerificationSequence adds a verification of a specific sequence of requests to MockServer
-func (c *Client) AddVerificationSequence(v []*VerificationSequence) {
-	msg, err := json.Marshal(v)
+func (c *Client) AddVerificationSequence(vs *VerificationSequence) {
+	msg, err := json.Marshal(vs)
 	if err != nil {
 		require.NoError(c.T, err,
 			"Failed to serialize mock server verification sequence.")
@@ -56,7 +55,6 @@ func (c *Client) AddVerificationSequence(v []*VerificationSequence) {
 
 	c.callMock("verifySequence", string(msg))
 }
-*/
 
 // Clear everything that matches a given path in MockServer
 func (c *Client) Clear(path string) {

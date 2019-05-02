@@ -8,7 +8,7 @@ Usage:
 Create an expectation example:
 ```
 mockServer := mockclient.Client{
-    T: t, 
+    T: t,
     BaseURL: os.Getenv("MOCKSERVER_HOST"),
 }
 
@@ -24,7 +24,7 @@ defer mockServer.Clear("/(.*)")
 Create a verification example:
 ```
 mockServer := mockclient.Client{
-    T: t, 
+    T: t,
     BaseURL: os.Getenv("MOCKSERVER_HOST"),
 }
 
@@ -36,6 +36,21 @@ mockServer.AddVerification(
     ))
 ```
 
+Create a verification sequence example:
+```
+mockServer := mockclient.Client{
+    T: t,
+    BaseURL: os.Getenv("MOCKSERVER_HOST"),
+}
+
+mockServer.AddVerificationSequence(
+    mockclient.CreateVerificationSequence(
+        mockclient.WhenRequestPath("/a"),
+        mockclient.WhenRequestPath("/b"),
+        mockclient.WhenRequestPath("/c"),
+    ))
+```
+
 Expectation Defaults:
 * unlimited calls will respond to a match
 * calls are not delayed
@@ -43,7 +58,7 @@ Expectation Defaults:
 * body of matched calls is empty
 
 Verification Defaults:
-* matched request occurs once i.e. at 1 least call and at most 1 call 
+* matched request occurs once i.e. at 1 least call and at most 1 call
 
 Links:
 * Expectations - http://www.mock-server.com/mock_server/creating_expectations.html

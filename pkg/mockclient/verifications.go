@@ -1,8 +1,8 @@
 package mockclient
 
-// VerificationSequence defines a specific sequence of calls to MockServer
+// VerificationSequence defines a specific ordered sequence of requests to MockServer
 type VerificationSequence struct {
-	Path string `json:"path,omitempty"`
+	Requests []*RequestMatcher `json:"httpRequests"`
 }
 
 // CreateVerification converts a number of expectation parts (options) into a single Expectation
@@ -41,28 +41,23 @@ func ThenAtMostCalls(times int) ExpectationOption {
 	}
 }
 
-/*
-// VerificationOption enables building verifications in many parts
-type VerificationOption func(e *VerificationSequence) *VerificationSequence
+// CreateVerificationSequence creates verifications for a given expectation sequence
+func CreateVerificationSequence(opts ...ExpectationOption) *VerificationSequence {
 
-// CreateVerificationSequence creates a verification for a given expectation sequence
-func CreateVerificationSequence(opts ...VerificationOption) []*VerificationSequence {
-	vsArray := make([]*VerificationSequence, 0)
+	eArray := make([]*Expectation, 0)
 	for _, opt := range opts {
-		v := &VerificationSequence{}
-		vsArray = append(vsArray, opt(v))
+		e := &Expectation{
+			Request: &RequestMatcher{},
+		}
+		eArray = append(eArray, opt(e))
 	}
-
-	return vsArray
-}
-
-func VerifyPath(path string) VerificationOption {
-	return func(vs *VerificationSequence) *VerificationSequence {
-		vs.Path = path
-		return vs
+	//TODO: tidy up
+	vs := &VerificationSequence{}
+	for _, item := range eArray {
+		vs.Requests = append(vs.Requests, item.Request)
 	}
+	return vs
 }
-*/
 
 func integerPointer(i int) *int {
 	return &i
