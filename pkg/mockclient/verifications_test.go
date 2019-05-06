@@ -18,36 +18,47 @@ func TestVerifications(t *testing.T) {
 		expectation  *Expectation
 		expectedJSON string
 	}{
-		{"Verify the MockServer was called at least 1 times, and at most 1 times, for a given path, by using the defaults.", CreateVerification(WhenRequestPath("/path")), `
-		{
-			"httpRequest": {
-				"path": "/path"
-			},
-			"times": {
-				"atLeast": 1,
-        	    "atMost": 1
-			}
-		}`},
-		{"Verify the MockServer was called at least 0 times, and at most 1 times, for a given path, by using the default atMost.", CreateVerification(WhenRequestPath("/path"), ThenAtLeastCalls(0)), `
-		{
-			"httpRequest": {
-				"path": "/path"
-			},
-			"times": {
-				"atLeast": 0,
-        	    "atMost": 1
-			}
-		}`},
-		{"Verify the MockServer was called at least 5 times, and at most 10 times, for a given path.", CreateVerification(WhenRequestPath("/path"), ThenAtLeastCalls(5), ThenAtMostCalls(10)), `
-		{
-			"httpRequest": {
-				"path": "/path"
-			},
-			"times": {
-				"atLeast": 5,
-        	    "atMost": 10
-			}
-		}`},
+        {"Verify the MockServer was called at least 1 times, and at most 1 times, for a given path, by using the defaults.", CreateVerification(WhenRequestPath("/path")), `
+        {
+            "httpRequest": {
+                "path": "/path"
+            },
+            "times": {
+                "atLeast": 1,
+                "atMost": 1
+            }
+            }`},
+        {"Verify the MockServer was called at least 1 times, and at most 1 times, for a given path and given HTTP method, by using the defaults.", CreateVerification(WhenRequestPath("/path"), WhenRequestMethod("GET")), `
+        {
+            "httpRequest": {
+                "path": "/path",
+                "method": "GET"
+            },
+            "times": {
+                "atLeast": 1,
+                "atMost": 1
+            }
+        }`},
+        {"Verify the MockServer was called at least 0 times, and at most 1 times, for a given path, by using the default atMost.", CreateVerification(WhenRequestPath("/path"), ThenAtLeastCalls(0)), `
+        {
+            "httpRequest": {
+                "path": "/path"
+            },
+            "times": {
+                "atLeast": 0,
+                "atMost": 1
+            }
+        }`},
+        {"Verify the MockServer was called at least 5 times, and at most 10 times, for a given path.", CreateVerification(WhenRequestPath("/path"), ThenAtLeastCalls(5), ThenAtMostCalls(10)), `
+        {
+            "httpRequest": {
+                "path": "/path"
+            },
+            "times": {
+                "atLeast": 5,
+                "atMost": 10
+            }
+        }`},
 	}
 
 	for _, tc := range testCases {
@@ -79,27 +90,29 @@ func TestVerifications(t *testing.T) {
 	}
 }
 
-/*
 func TestVerificationSequence(t *testing.T) {
 
 	// Define test table
 	testCases := []struct {
-		description          string
-		verificationSequence []*VerificationSequence
-		expectedJSON         string
+		description  string
+		expectations []*Expectation
+		expectedJSON string
 	}{
-		{"Verify the MockServer was called with these specific calls in this specific order.", CreateVerificationSequence(VerifyPath("/some/path/one"), VerifyPath("/some/path/two"), VerifyPath("/some/path/three")), `
-		[
-			{
-			"path": "/some/path/one"
-			},
-			{
-			"path": "/some/path/two"
-			},
-			{
-			"path": "/some/path/three"
-			}
-		]`},
+        {"Verify the MockServer was called with these specific calls in this specific order.", []*Expectation{CreateVerification(WhenRequestPath("/some/path/one")), CreateVerification(WhenRequestPath("/some/path/two")), CreateVerification(WhenRequestPath("/some/path/three"), WhenRequestMethod("POST"))}, `
+        {
+            "httpRequests": [
+                {
+                    "path": "/some/path/one"
+                },
+                {
+                    "path": "/some/path/two"
+                },
+                {
+                    "path": "/some/path/three",
+                    "method": "POST"
+                }
+            ]
+        }`},
 	}
 
 	for _, tc := range testCases {
@@ -109,11 +122,11 @@ func TestVerificationSequence(t *testing.T) {
 				body, err := ioutil.ReadAll(r.Body)
 				require.NoError(t, err, "Body reader must not return an error.")
 
-				var bodyMap []map[string]interface{}
+				bodyMap := make(map[string]interface{})
 				err = json.Unmarshal(body, &bodyMap)
 				require.NoError(t, err, "Body un-marshall must not return an error.")
 
-				var expectedMap []map[string]interface{}
+				expectedMap := make(map[string]interface{})
 				err = json.Unmarshal([]byte(tc.expectedJSON), &expectedMap)
 				require.NoError(t, err, "Body un-marshall must not return an error.")
 
@@ -126,8 +139,7 @@ func TestVerificationSequence(t *testing.T) {
 				BaseURL: ts.URL,
 				T:       t,
 			}
-			mockClient.AddVerificationSequence(tc.verificationSequence)
+			mockClient.AddVerificationSequence(tc.expectations...)
 		})
 	}
 }
-*/
