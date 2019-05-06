@@ -8,7 +8,7 @@ Usage:
 Create an expectation example:
 ```
 mockServer := mockclient.Client{
-    T: t, 
+    T: t,
     BaseURL: os.Getenv("MOCKSERVER_HOST"),
 }
 
@@ -24,7 +24,7 @@ defer mockServer.Clear("/(.*)")
 Create a verification example:
 ```
 mockServer := mockclient.Client{
-    T: t, 
+    T: t,
     BaseURL: os.Getenv("MOCKSERVER_HOST"),
 }
 
@@ -36,14 +36,40 @@ mockServer.AddVerification(
     ))
 ```
 
-Expectation Defaults:
+Create a verification sequence example:
+```
+mockServer := mockclient.Client{
+    T: t,
+    BaseURL: os.Getenv("MOCKSERVER_HOST"),
+}
+
+mockServer.AddVerificationSequence(
+    mockclient.CreateVerification(
+        mockclient.WhenRequestPath("/a"),
+    ),
+    mockclient.CreateVerification(
+        mockclient.WhenRequestPath("/b(.*)"),
+    ),
+    mockclient.CreateVerification(
+        mockclient.WhenRequestPath("/c"),
+        mockclient.WhenRequestMethod("POST"),
+    ),
+)
+
+```
+
+Expectation defaults:
 * unlimited calls will respond to a match
 * calls are not delayed
 * status of matched calls is 200 OK
 * body of matched calls is empty
 
-Verification Defaults:
-* matched request occurs once i.e. at 1 least call and at most 1 call 
+Verification defaults:
+* matched request occurs once i.e. at 1 least call and at most 1 call
+
+Verification sequence notes:
+* the order of the requests matters as the requests form a sequence to be verified
+* only the request part is used for matching the sequence i.e. request count is not applicable
 
 Links:
 * Expectations - http://www.mock-server.com/mock_server/creating_expectations.html
