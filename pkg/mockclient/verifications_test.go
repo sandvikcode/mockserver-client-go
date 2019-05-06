@@ -24,7 +24,7 @@ func TestVerifications(t *testing.T) {
 				"path": "/path"
 			},
 			"times": {
-				"atLeast": 1,
+		    	"atLeast": 1,
         	    "atMost": 1
 			}
 		}`},
