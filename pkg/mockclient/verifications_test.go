@@ -18,47 +18,47 @@ func TestVerifications(t *testing.T) {
 		expectation  *Expectation
 		expectedJSON string
 	}{
-		{"Verify the MockServer was called at least 1 times, and at most 1 times, for a given path, by using the defaults.", CreateVerification(WhenRequestPath("/path")), `
-		{
-			"httpRequest": {
-				"path": "/path"
-			},
-			"times": {
+        {"Verify the MockServer was called at least 1 times, and at most 1 times, for a given path, by using the defaults.", CreateVerification(WhenRequestPath("/path")), `
+        {
+            "httpRequest": {
+                "path": "/path"
+            },
+            "times": {
                 "atLeast": 1,
                 "atMost": 1
-			}
-		}`},
-		{"Verify the MockServer was called at least 1 times, and at most 1 times, for a given path and given HTTP method, by using the defaults.", CreateVerification(WhenRequestPath("/path"), WhenRequestMethod("GET")), `
-		{
-			"httpRequest": {
-				"path": "/path",
-				"method": "GET"
-			},
-			"times": {
+            }
+            }`},
+        {"Verify the MockServer was called at least 1 times, and at most 1 times, for a given path and given HTTP method, by using the defaults.", CreateVerification(WhenRequestPath("/path"), WhenRequestMethod("GET")), `
+        {
+            "httpRequest": {
+                "path": "/path",
+                "method": "GET"
+            },
+            "times": {
                 "atLeast": 1,
                 "atMost": 1
-			}
-		}`},
-		{"Verify the MockServer was called at least 0 times, and at most 1 times, for a given path, by using the default atMost.", CreateVerification(WhenRequestPath("/path"), ThenAtLeastCalls(0)), `
-		{
-			"httpRequest": {
-				"path": "/path"
-			},
-			"times": {
+            }
+        }`},
+        {"Verify the MockServer was called at least 0 times, and at most 1 times, for a given path, by using the default atMost.", CreateVerification(WhenRequestPath("/path"), ThenAtLeastCalls(0)), `
+        {
+            "httpRequest": {
+                "path": "/path"
+            },
+            "times": {
                 "atLeast": 0,
                 "atMost": 1
-			}
-		}`},
-		{"Verify the MockServer was called at least 5 times, and at most 10 times, for a given path.", CreateVerification(WhenRequestPath("/path"), ThenAtLeastCalls(5), ThenAtMostCalls(10)), `
-		{
-			"httpRequest": {
-				"path": "/path"
-			},
-			"times": {
+            }
+        }`},
+        {"Verify the MockServer was called at least 5 times, and at most 10 times, for a given path.", CreateVerification(WhenRequestPath("/path"), ThenAtLeastCalls(5), ThenAtMostCalls(10)), `
+        {
+            "httpRequest": {
+                "path": "/path"
+            },
+            "times": {
                 "atLeast": 5,
                 "atMost": 10
-			}
-		}`},
+            }
+        }`},
 	}
 
 	for _, tc := range testCases {
@@ -98,21 +98,21 @@ func TestVerificationSequence(t *testing.T) {
 		expectations []*Expectation
 		expectedJSON string
 	}{
-		{"Verify the MockServer was called with these specific calls in this specific order.", []*Expectation{CreateVerification(WhenRequestPath("/some/path/one")), CreateVerification(WhenRequestPath("/some/path/two")), CreateVerification(WhenRequestPath("/some/path/three"), WhenRequestMethod("POST"))}, `
-		{
-			"httpRequests": [
-				{
-					"path": "/some/path/one"
-				},
-				{
-					"path": "/some/path/two"
-				},
-				{
+        {"Verify the MockServer was called with these specific calls in this specific order.", []*Expectation{CreateVerification(WhenRequestPath("/some/path/one")), CreateVerification(WhenRequestPath("/some/path/two")), CreateVerification(WhenRequestPath("/some/path/three"), WhenRequestMethod("POST"))}, `
+        {
+            "httpRequests": [
+                {
+                    "path": "/some/path/one"
+                },
+                {
+                    "path": "/some/path/two"
+                },
+                {
                     "path": "/some/path/three",
                     "method": "POST"
-				}
-			]
-		}`},
+                }
+                ]
+        }`},
 	}
 
 	for _, tc := range testCases {
