@@ -111,7 +111,7 @@ func TestVerificationSequence(t *testing.T) {
                     "path": "/some/path/three",
                     "method": "POST"
                 }
-                ]
+            ]
         }`},
 	}
 
