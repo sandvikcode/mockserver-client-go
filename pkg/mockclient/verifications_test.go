@@ -24,8 +24,8 @@ func TestVerifications(t *testing.T) {
 				"path": "/path"
 			},
 			"times": {
-		    	"atLeast": 1,
-        	    "atMost": 1
+                "atLeast": 1,
+                "atMost": 1
 			}
 		}`},
 		{"Verify the MockServer was called at least 1 times, and at most 1 times, for a given path and given HTTP method, by using the defaults.", CreateVerification(WhenRequestPath("/path"), WhenRequestMethod("GET")), `
@@ -35,8 +35,8 @@ func TestVerifications(t *testing.T) {
 				"method": "GET"
 			},
 			"times": {
-				"atLeast": 1,
-        	    "atMost": 1
+                "atLeast": 1,
+                "atMost": 1
 			}
 		}`},
 		{"Verify the MockServer was called at least 0 times, and at most 1 times, for a given path, by using the default atMost.", CreateVerification(WhenRequestPath("/path"), ThenAtLeastCalls(0)), `
@@ -45,8 +45,8 @@ func TestVerifications(t *testing.T) {
 				"path": "/path"
 			},
 			"times": {
-				"atLeast": 0,
-        	    "atMost": 1
+                "atLeast": 0,
+                "atMost": 1
 			}
 		}`},
 		{"Verify the MockServer was called at least 5 times, and at most 10 times, for a given path.", CreateVerification(WhenRequestPath("/path"), ThenAtLeastCalls(5), ThenAtMostCalls(10)), `
@@ -55,8 +55,8 @@ func TestVerifications(t *testing.T) {
 				"path": "/path"
 			},
 			"times": {
-				"atLeast": 5,
-        	    "atMost": 10
+                "atLeast": 5,
+                "atMost": 10
 			}
 		}`},
 	}
@@ -108,8 +108,8 @@ func TestVerificationSequence(t *testing.T) {
 					"path": "/some/path/two"
 				},
 				{
-					"path": "/some/path/three",
-					"method": "POST"
+                    "path": "/some/path/three",
+                    "method": "POST"
 				}
 			]
 		}`},
