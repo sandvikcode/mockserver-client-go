@@ -55,7 +55,7 @@ mockServer.AddVerificationSequence(
         mockclient.WhenRequestMethod("POST"),
     ),
 )
-    
+
 ```
 
 Expectation defaults:
@@ -68,6 +68,7 @@ Verification defaults:
 * matched request occurs once i.e. at 1 least call and at most 1 call
 
 Verification sequence notes:
+* the order of the requests matters as the requests form a sequence to be verified
 * only the request part is used for matching the sequence i.e. request count is not applicable
 
 Links:
