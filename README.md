@@ -5,6 +5,13 @@ The mockserver client is a golang client for use with the fantastic http://www.m
 Usage:
 * Import the library `import "github.com/sandvikcode/mockserver-client-go/pkg/mockclient"`
 
+* Add following constraint to `Gopkg.toml` then run `dep ensure -v` instead of running `dep ensure -v -add` 
+```
+[[constraint]]
+  name = "github.com/sandvikcode/mockserver-client-go"
+  version = "0.0.5"
+```
+
 Create an expectation example:
 ```
 mockServer := mockclient.Client{
