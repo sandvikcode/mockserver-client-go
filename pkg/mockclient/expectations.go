@@ -2,6 +2,7 @@ package mockclient
 
 import (
 	"fmt"
+	"reflect"
 	"time"
 )
 
@@ -9,6 +10,7 @@ import (
 type Expectation struct {
 	Request  *RequestMatcher `json:"httpRequest"`
 	Response *ActionResponse `json:"httpResponse,omitempty"`
+	Error    *ActionError    `json:"httpError,omitempty"`
 	Times    *Times          `json:"times,omitempty"`
 }
 
@@ -26,6 +28,11 @@ type ActionResponse struct {
 	StatusCode int                 `json:"statusCode,omitempty"`
 	Body       *ResponseBody       `json:"body,omitempty"`
 	Delay      *Delay              `json:"delay,omitempty"`
+}
+
+// ActionError defines the failure mode
+type ActionError struct {
+	DropConnection bool `json:"dropConnection,omitempty"`
 }
 
 // ResponseBody defines the request body the MockServer will return when serving a matched response
@@ -60,11 +67,20 @@ func CreateExpectation(opts ...ExpectationOption) *Expectation {
 			Path: "/(.*)",
 		},
 		Response: &ActionResponse{},
+		Error:    &ActionError{},
 	}
 
 	// Append all options that are set (discard defaults)
 	for _, opt := range opts {
 		e = opt(e)
+	}
+
+	if reflect.DeepEqual(e.Response, &ActionResponse{}) {
+		e.Response = nil
+	}
+
+	if reflect.DeepEqual(e.Error, &ActionError{}) {
+		e.Error = nil
 	}
 
 	return e
@@ -192,6 +208,15 @@ func ThenResponseDelay(delay time.Duration) ExpectationOption {
 			TimeUnit: "MILLISECONDS",
 			Value:    int(delay.Nanoseconds() / 1e6),
 		}
+		return e
+	}
+}
+
+// ThenDropConnection creates an action that prematurely closes the connection
+func ThenDropConnection() ExpectationOption {
+	return func(e *Expectation) *Expectation {
+		r := e.Error
+		r.DropConnection = true
 		return e
 	}
 }
