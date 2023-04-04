@@ -131,6 +131,15 @@ func TestExpectations(t *testing.T) {
   				"unlimited" : false
 			}
 		}`},
+		{"Path should be matched and then an error occurs", CreateExpectation(WhenRequestPath("/path"), ThenDropConnection()), `
+    {
+      "httpRequest": {
+        "path": "/path"
+      },
+      "httpError": {
+        "dropConnection": true
+      }
+    }`},
 	}
 
 	for _, tc := range testCases {
